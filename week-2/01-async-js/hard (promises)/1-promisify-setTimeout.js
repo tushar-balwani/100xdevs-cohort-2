@@ -4,13 +4,15 @@
 
 function wait(n) {
   const p = new Promise(function (resolve) {
-    resolve(n);
+    setTimeout(function () {
+      resolve();
+    }, n * 1000);
   });
   return p;
 }
 
-wait(2).then(function (n) {
-  setTimeout(function () {
-    console.log("Hello to JavaScript Promise");
-  }, n * 1000);
-});
+// wait(2).then(function (n) {
+//   setTimeout(function () {}, n * 1000);
+// });
+
+module.exports = wait;
