@@ -39,11 +39,68 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+const express = require("express");
+const bodyParser = require("body-parser");
+const { v4: uuidv4 } = require("uuid");
+const app = express();
+
+let todos = [];
+
+app.use(bodyParser.json());
+
+app.get("/todos", function (req, res) {
+  return res.status(200).json(todos);
+});
+
+app.get("/todos/:id", function (req, res) {
+  const todoId = req.params.id;
+  const data = todos.find((each) => each.id === todoId);
+  console.log(data);
+  if (!data) return res.status(404).send();
+  return res.status(200).json(data);
+});
+
+app.post("/todos", function (req, res) {
+  const title = req.body.title;
+  // const completed = req.body.completed;
+  const description = req.body.description;
+  const id = uuidv4();
+  const payload = {
+    id,
+    title,
+    description,
+    // completed,
+  };
+  todos.push(payload);
+  return res.status(201).json(payload);
+});
+
+app.put("/todos/:id", function (req, res) {
+  const todoId = req.params.id;
+  const data = todos.find((each) => each.id === todoId);
+  if (!data) return res.status(404).send();
+  const title = req.body.title;
+  const description = req.body.description;
+  data.title = title;
+  data.description = description;
+  return res.json(data);
+});
+
+app.delete("/todos/:id", function (req, res) {
+  const todoId = req.params.id;
+  const index = todos.findIndex((each) => each.id === todoId);
+  if (index === -1) return res.status(404).send();
+
+  todos.splice(index, 1);
+  return res.send(200).send();
+});
+
+// for all other routes, return 404
+app.use((req, res, next) => {
+  res.status(404).send();
+});
+
+// app.listen(3000, (req, res) => {
+//   console.log("listening t0 3000");
+// });
+module.exports = app;
